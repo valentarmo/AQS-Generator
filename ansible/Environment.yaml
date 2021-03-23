@@ -2,6 +2,11 @@
   remote_user: ec2-user
   become: yes
 
+  vars:
+    AwsAccessKeyId: {{ lookup('env', 'AWS_ACCESS_KEY_ID') }}
+    AwsSecretAccessKey: {{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }} 
+    AwsDefaultRegion: {{ lookup('env', 'AWS_DEFAULT_REGION') }}
+
   tasks:
     - name: Update Packages
       yum:
@@ -42,3 +47,9 @@
         enabled: yes
         daemon_reload: yes
 
+    - name: Append environment variables to profile
+      shell: |
+        echo "export AWS_ACCESS_KEY_ID={{ AwsAccessKeyId }}" >> ~/.profile
+        echo "export AWS_SECRET_ACCESS_KEY={{ AwsSecretAccessKey }}" >> ~/.profile
+        echo "export AWS_DEFAULT_REGION={{ AwsDefaultRegion }}" >> ~/.profile
+        source ~/.profile

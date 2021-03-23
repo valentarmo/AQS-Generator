@@ -1,0 +1,24 @@
+version: 0.2
+
+env:
+  variables:
+    DOCKER_USER: fighur
+  parameter-store:
+    DOCKER_PASSWORD: DockerPassword
+
+phases:
+  install:
+    runtime-versions:
+      python: latest
+  pre_build:
+    commands:
+      - pip3 install pipenv
+      - pipenv install --system
+      - python src/test_DataGenerator.py
+      - docker login -u DOCKER_USER -p $DOCKER_PASSWORD
+  build:
+    commands:
+      - docker build --tag AQSDataGenerator:latest .
+  post_build:
+    commands:
+      - docker push fighur/AQSDataGenerator:latest
