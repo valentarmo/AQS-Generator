@@ -1,0 +1,44 @@
+- hosts: Generators
+  remote_user: ec2-user
+  become: yes
+
+  tasks:
+    - name: Update Packages
+      yum:
+        name: '*'
+        state: latest
+
+    - name: Install docker
+      shell: |
+        amazon-linux-extras install docker -y
+        usermod -a -G docker ec2-user
+
+    - name: Start Docker as a service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Install Ruby and Git
+      yum:
+        name: 
+          - ruby
+          - git
+
+    - name: Download the CodeDeploy Agent Installer
+      get_url:
+        url: https://aws-codedeploy-us-east-2.s3.us-east-2.amazonaws.com/latest/install
+        mode: '711'
+        dest: ~/install
+
+    - name: Install CodeDeploy
+      shell: ~/install auto
+
+    - name: Start the CodeDeploy Agent
+      systemd:
+        name: codedeploy-agent
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
