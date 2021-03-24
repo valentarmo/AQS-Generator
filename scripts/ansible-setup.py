@@ -2,6 +2,7 @@
 
 import argparse
 import boto3
+import yaml
 import time
 import os
 
@@ -9,7 +10,7 @@ import os
 def create_stack(stack_name, key_name, region, client):
     print('Creating CloudFormation Stack...')
     dir_path = os.path.dirname(__file__)
-    template_path = os.path.join(dir_path, '../', 'cloudformation/', 'Environment.yaml')
+    template_path = os.path.join(dir_path, '../', 'cloudformation/', 'DataGenerators.yaml')
     template_body = ''
     with open(template_path, 'r') as f:
         template_body = f.read()
@@ -51,6 +52,23 @@ def create_hosts_file(group_name, private_key_path, hosts_ips):
         f.write(inventory_info)
 
 
+def create_taskcat_file(region):
+    dir_path = os.path.dirname(__file__)
+    taskcat_file_path = os.path.join(dir_path, '../', 'taskcat.yaml')
+    contents = {
+        'project': {
+            'name': 'AQSDataGenerators',
+            'regions': [region],
+            'tests': {
+                'creation-test': {
+                    'template': 'cloudformation/DataGenerators.yaml'
+                }
+            }
+        }
+    }
+    with open(taskcat_file_path, 'w') as f:
+        yaml.dump(contents, f)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -65,5 +83,6 @@ if __name__ == '__main__':
         create_stack(args.StackName, args.KeyName, args.Region, CloudFormation)
         wait_until_stack_is_created(args.StackName, CloudFormation)
         create_hosts_file('Generators', args.PrivateKeyFilePath, get_hosts_ips(args.StackName, CloudFormation))
+        create_taskcat_file(args.Region)
     except Exception as e:
         print(e)

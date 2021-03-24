@@ -16,6 +16,8 @@ phases:
       - pipenv install --system
       - python src/test_DataGenerator.py
       - docker login -u DOCKER_USER -p $DOCKER_PASSWORD
+      - pip3 install taskcat
+      - taskcat test run
   build:
     commands:
       - docker build --tag AQSDataGenerator:latest .
