@@ -1,4 +1,5 @@
 Description: Deploy several EC2 instances
+
 Parameters:
   KeyName:
     Description: Name of an existing EC2 KeyPair
@@ -7,6 +8,7 @@ Parameters:
     Description: AWS Region
     Type: String
     AllowedValues: [us-east-1, us-west-1, us-east-2, us-west-2]
+
 Mappings:
   RegionMap:
     us-east-1:
@@ -17,41 +19,8 @@ Mappings:
       AMI: ami-01aab85a5e4a5a0fe
     us-west-2:
       AMI: ami-0e999cbd62129e3b1
+
 Resources:
-  CodeDeployRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      Description: Role for CodeDeploy
-      ManagedPolicyArns: ['arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole']
-      RoleName: AQSGeneratorsCodeDeployRole
-      Path: '/'
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - codedeploy.amazonaws.com
-            Action:
-              - "sts:AssumeRole"
-  CodeDeployApplication:
-    Type: 'AWS::CodeDeploy::Application'
-    Properties:
-      ApplicationName: AQSGenerators
-      ComputePlatform: Server
-  DeploymentGroup:
-    Type: 'AWS::CodeDeploy::DeploymentGroup'
-    Properties:
-      ApplicationName: AQSGenerators
-      DeploymentGroupName: AQSGeneratorsDeploymentGroup
-      DeploymentConfigName: CodeDeployDefault.AllAtOnce
-      Ec2TagFilters:
-        - Key: AQSGenerator
-          Type: KEY_ONLY
-      ServiceRoleArn: !GetAtt CodeDeployRole.Arn
-      DeploymentStyle:
-        DeploymentOption: WITHOUT_TRAFFIC_CONTROL
-        DeploymentType: IN_PLACE
   SSHSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -61,6 +30,7 @@ Resources:
         FromPort: 22
         IpProtocol: tcp
         ToPort: 22
+
   EC2Instance0:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -68,9 +38,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes 
+
   EC2Instance1:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -78,9 +46,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
   EC2Instance2:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -88,9 +54,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
   EC2Instance3:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -98,9 +62,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
   EC2Instance4:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -108,9 +70,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
   EC2Instance5:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -118,9 +78,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
   EC2Instance6:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -128,9 +86,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
   EC2Instance7:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -138,9 +94,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
   EC2Instance8:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -148,9 +102,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
   EC2Instance9:
     Type: 'AWS::EC2::Instance'
     Properties:
@@ -158,9 +110,7 @@ Resources:
       ImageId: !FindInMap [RegionMap, !Ref Region, AMI]
       InstanceType: t2.micro
       SecurityGroups: [!Ref SSHSecurityGroup]
-      Tags:
-        - Key: AQSGenerator
-          Value: yes
+
 Outputs:
   PublicIP0:
     Value: !GetAtt EC2Instance0.PublicIp
