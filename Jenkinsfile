@@ -9,18 +9,22 @@ pipeline {
     stages {
         stage('Intall application dependencies') {
             steps {
-                echo 'Installing Application dependencies'
-                sh 'pipenv install'
-                echo 'Finished Installing Application dependencies'
+                withEnv(['PATH+EXTRA=/usr/local/bin']) {
+                    echo 'Installing Application dependencies'
+                    sh 'pipenv install'
+                    echo 'Finished Installing Application dependencies'
+                }
             }
         }
         stage('Test application') {
             steps {
-                echo 'Starting Application Tests'
-                sh 'pipenv shell'
-                sh 'python ./src/test_DataGenerator'
-                sh 'exit'
-                echo 'Finished Application Tests'
+                withEnv(['PATH+EXTRA=/usr/local/bin']) {
+                    echo 'Starting Application Tests'
+                    sh 'pipenv shell'
+                    sh 'python ./src/test_DataGenerator'
+                    sh 'exit'
+                    echo 'Finished Application Tests'
+                }
             }
         }
         stage('Build Docker Image') {
@@ -50,10 +54,12 @@ pipeline {
         }
         stage('Test infrastructure') {
             steps {
-                echo 'Starting Infrastructure Tests'
-                sh 'python ./scripts/create-task-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}'
-                sh 'taskcat test run'
-                echo 'Finished Infrastructure Tests'
+                withEnv(['PATH+EXTRA=/usr/local/bin']) {
+                    echo 'Starting Infrastructure Tests'
+                    sh 'python ./scripts/create-task-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}'
+                    sh 'taskcat test run'
+                    echo 'Finished Infrastructure Tests'
+                }
             }
         }
         stage('Deploy Infrastructure') {
@@ -63,11 +69,13 @@ pipeline {
                 }
             }
             steps {
-                echo 'Starting Infrastructure Deployment'
-                sh 'pipenv shell'
-                sh 'python ./scripts/deploy-infrastructure.py --StackName ${env.AQS_GENERATORS_STACK_NAME} --KeyName ${env.AQS_GENERATORS_KEY_NAME} --Region ${env.AQS_GENERATORS_REGION} --PrivateKeyS3Bucket ${env.AQS_GENERATORS_KEY_S3_BUCKET} --PrivateKeyS3FilePath ${env.AQS_GENERATORS_KEY_S3_PATH}'
-                sh 'exit'
-                echo 'Finished Infrastructure Deployment'
+                withEnv(['PATH+EXTRA=/usr/local/bin']) {
+                    echo 'Starting Infrastructure Deployment'
+                    sh 'pipenv shell'
+                    sh 'python ./scripts/deploy-infrastructure.py --StackName ${env.AQS_GENERATORS_STACK_NAME} --KeyName ${env.AQS_GENERATORS_KEY_NAME} --Region ${env.AQS_GENERATORS_REGION} --PrivateKeyS3Bucket ${env.AQS_GENERATORS_KEY_S3_BUCKET} --PrivateKeyS3FilePath ${env.AQS_GENERATORS_KEY_S3_PATH}'
+                    sh 'exit'
+                    echo 'Finished Infrastructure Deployment'
+                }
             }
         }
         stage('Configure Infrastructure') {
