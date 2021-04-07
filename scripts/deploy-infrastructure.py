@@ -88,15 +88,18 @@ def get_hosts_ips(stack_name, client):
 
 
 def download_private_key(s3_bucket, key_path, key_name):
+    print('Downloading Key Pair')
     s3 = boto3.client('s3')
     dir_path = os.path.dirname(__file__)
-    file_name = os.path.join(dir_path, key_name + '.pem')
+    file_name = os.path.join(dir_path, '..', key_name + '.pem')
     s3.download_file(s3_bucket, key_path, file_name)
-    os.system(f'chmod 400 {file_name}')
+    os.system(f'chmod 600 {file_name}')
+    print(f'Key Pair Downloaded at {file_name}')
     return file_name
 
 
 def create_hosts_file(group_name, private_key_path, hosts_ips):
+    print('Creating hosts file')
     inventory_info =  f'[{group_name}]\n'
     for host_ip in hosts_ips:
         inventory_info += f'{host_ip}\n'
@@ -105,6 +108,7 @@ def create_hosts_file(group_name, private_key_path, hosts_ips):
     file_path = os.path.join(dir_path, '../', 'ansible/', 'hosts.ini')
     with open(file_path, 'w') as f:
         f.write(inventory_info)
+    print(f'Hosts file created at {file_path}')
 
 
 if __name__ == '__main__':

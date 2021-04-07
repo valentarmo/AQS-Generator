@@ -1,5 +1,11 @@
 Pipeline {
     agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        DOCKER_CREDENTIALS = credentials('docker-credentials')
+    } 
     stages {
         stage('Intall application dependencies') {
             steps {
@@ -25,7 +31,7 @@ Pipeline {
             }
             steps {
                 echo 'Building Docker Image'
-                sh 'docker login -u ${env.DOCKER_USER} -p ${env.DOCKER_PASSWORD}'
+                sh 'docker login -u ${env.DOCKER_CREDENTIALS_USR} -p ${env.DOCKER_CREDENTIALS_PSW}'
                 sh 'docker build --tag AQSDataGenerator:latest .'
                 echo 'Finished Building Docker Image'
             }
@@ -38,7 +44,7 @@ Pipeline {
             }
             steps {
                 echo 'Publishing Docker Image'
-                sh 'docker push ${env.DOCKER_USER}/AQSDataGenerator:latest'
+                sh 'docker push ${env.DOCKER_CREDENTIALS_USR}/AQSDataGenerator:latest'
                 echo 'Finished Publishing Docker Image'
             }
         }

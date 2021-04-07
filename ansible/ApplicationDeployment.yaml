@@ -4,6 +4,10 @@
 
   vars:
     ContainerIdFile: ~/aqs_generator_container_id.cid 
+    AwsAccessKeyId: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+    AwsSecretAccessKey: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+    AwsDefaultRegion: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
+    DockerUserName: "{{ lookup('env', 'DOCKER_CREDENTIALS_USR') }}"
 
   tasks:
     - name: Stop Previous Container
@@ -12,13 +16,15 @@
           CONTAINER_ID=$(cat {{ ContainerIdFile }})
           docker stop $CONTAINER_ID
           docker rm $CONTAINER_ID
-          rm ~/aqs_generator_container_id.cid
+          rm {{ ContainerIdFile }}
         fi
     - name: Deploy
       shell: >
         docker run -d 
         --cidfile {{ ContainerIdFile }}
-        -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID 
-        -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY 
-        -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION 
-        $DOCKER_USER/AQSDataGenerator:latest)
+        -e AWS_ACCESS_KEY_ID={{ AwsAccessKeyId }}
+        -e AWS_SECRET_ACCESS_KEY={{ AwsSecretAccessKey }}
+        -e AWS_DEFAULT_REGION={{ AwsDefaultRegion }}
+        -p 80:80
+        -p 443:443
+        {{ DockerUserName }}/AQSDataGenerator:latest)

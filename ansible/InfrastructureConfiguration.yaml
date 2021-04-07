@@ -2,20 +2,7 @@
   remote_user: ec2-user
   become: yes
 
-  vars:
-    AwsAccessKeyId: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
-    AwsSecretAccessKey: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
-    AwsDefaultRegion: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
-    DockerUserName: "{{ lookup('env', 'DOCKER_USER') }}"
-
   tasks:
-    - name: Check AWS Variables
-      debug:
-        msg:
-          - 'AWS Access Key ID: {{ AwsAccessKeyId }}'
-          - 'AWS Secret Access Key: {{ AwsSecretAccessKey }}'
-          - 'AWS Default Region: {{ AwsDefaultRegion }}'
-
     - name: Update Packages
       yum:
         name: '*'
@@ -32,11 +19,3 @@
         state: started
         enabled: yes
         daemon_reload: yes
-
-    - name: Append environment variables to profile
-      shell: |
-        echo "export AWS_ACCESS_KEY_ID={{ AwsAccessKeyId }}" >> /etc/profile
-        echo "export AWS_SECRET_ACCESS_KEY={{ AwsSecretAccessKey }}" >> /etc/profile
-        echo "export AWS_DEFAULT_REGION={{ AwsDefaultRegion }}" >> /etc/profile
-        echo "export DOCKER_USER={{ DockerUserName }}" >> /etc/profile
-        source /etc/profile
