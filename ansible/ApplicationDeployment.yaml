@@ -8,6 +8,7 @@
     AwsSecretAccessKey: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
     AwsDefaultRegion: "{{ lookup('env', 'AWS_DEFAULT_REGION') }}"
     DockerUserName: "{{ lookup('env', 'DOCKER_CREDENTIALS_USR') }}"
+    AQSGeneratorsDockerImageTagName: "{{ lookup('env', 'AQS_GENERATORS_DOCKER_IMAGE_TAG_NAME') }}"
 
   tasks:
     - name: Stop Previous Container
@@ -27,4 +28,4 @@
         -e AWS_DEFAULT_REGION={{ AwsDefaultRegion }}
         -p 80:80
         -p 443:443
-        {{ DockerUserName }}/AQSDataGenerator:latest)
+        {{ DockerUserName }}/{{ AQSGeneratorsDockerImageTagName }}:latest)

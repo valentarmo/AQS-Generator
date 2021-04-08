@@ -20,14 +20,14 @@ pipeline {
             steps {
                 echo 'Building Docker Image'
                 sh 'docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW'
-                sh 'docker build --tag AQSDataGenerator:latest .'
+                sh 'docker build --tag $AQS_GENERATORS_DOCKER_IMAGE_TAG_NAME:latest .'
                 echo 'Finished Building Docker Image'
             }
         }
         stage('Publish Docker Image') {
             steps {
                 echo 'Publishing Docker Image'
-                sh 'docker push $DOCKER_CREDENTIALS_USR/AQSDataGenerator:latest'
+                sh 'docker push $DOCKER_CREDENTIALS_USR/$AQS_GENERATORS_DOCKER_IMAGE_TAG_NAME:latest'
                 echo 'Finished Publishing Docker Image'
             }
         }
