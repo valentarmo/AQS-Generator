@@ -6,6 +6,8 @@ import time
 import json
 import random
 
+from botocore.exceptions import ClientError
+
 def generate_data(country_codes):
     return {
         'location': 'somewhere',
@@ -38,7 +40,18 @@ def send_to_firehose(data, stream_name, kinesis_client):
 
 def get_stream_name():
     ssm = boto3.client('ssm')
-    return ssm.get_parameter(Name='AQSDeliveryStreamName')['Parameter']['Value']
+    stream_name = ""
+    while not stream_name:
+        try:
+            stream_name = ssm.get_parameter(Name='AQSDeliveryStreamName')['Parameter']['Value']
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ParameterNotFound':
+                print('Parameter not found retrying')
+                time.sleep(10)
+                continue
+            else:
+                print(e)
+    return stream_name
 
 
 if __name__ == '__main__':
