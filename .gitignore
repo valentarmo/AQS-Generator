@@ -3,3 +3,5 @@ ansible/*.ini
 **/*.pem
 secrets/*
 *taskcat*
+
+!scripts/create-taskcat-file.py
