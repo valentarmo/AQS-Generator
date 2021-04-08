@@ -83,8 +83,11 @@ def wait_until_stack_is_created(stack_name, client):
 
 
 def get_hosts_ips(stack_name, client):
+    print('Getting host IPs')
     response = client.describe_stacks(StackName=stack_name)
-    return map(lambda output: output['OutputValue'],  response['Stacks'][0]['Outputs'])
+    ips = map(lambda output: output['OutputValue'],  response['Stacks'][0]['Outputs'])
+    print(f'Host Ips {ips}')
+    return ips
 
 
 def download_private_key(s3_bucket, key_path, key_name):

@@ -7,22 +7,11 @@ pipeline {
         DOCKER_CREDENTIALS = credentials('docker-credentials')
     } 
     stages {
-        stage('Intall application dependencies') {
-            steps {
-                withEnv(['PATH+EXTRA=/usr/local/bin']) {
-                    echo 'Installing Application dependencies'
-                    sh 'pipenv install'
-                    echo 'Finished Installing Application dependencies'
-                }
-            }
-        }
         stage('Test application') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Application Tests'
-                    sh 'pipenv shell'
-                    sh 'python ./src/test_DataGenerator'
-                    sh 'exit'
+                    sh 'python3 ./src/test_DataGenerator'
                     echo 'Finished Application Tests'
                 }
             }
@@ -56,7 +45,7 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Infrastructure Tests'
-                    sh 'python ./scripts/create-task-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}'
+                    sh 'python3 ./scripts/create-task-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}'
                     sh 'taskcat test run'
                     echo 'Finished Infrastructure Tests'
                 }
@@ -71,9 +60,7 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Infrastructure Deployment'
-                    sh 'pipenv shell'
-                    sh 'python ./scripts/deploy-infrastructure.py --StackName ${env.AQS_GENERATORS_STACK_NAME} --KeyName ${env.AQS_GENERATORS_KEY_NAME} --Region ${env.AQS_GENERATORS_REGION} --PrivateKeyS3Bucket ${env.AQS_GENERATORS_KEY_S3_BUCKET} --PrivateKeyS3FilePath ${env.AQS_GENERATORS_KEY_S3_PATH}'
-                    sh 'exit'
+                    sh 'python3 ./scripts/deploy-infrastructure.py --StackName ${env.AQS_GENERATORS_STACK_NAME} --KeyName ${env.AQS_GENERATORS_KEY_NAME} --Region ${env.AQS_GENERATORS_REGION} --PrivateKeyS3Bucket ${env.AQS_GENERATORS_KEY_S3_BUCKET} --PrivateKeyS3FilePath ${env.AQS_GENERATORS_KEY_S3_PATH}'
                     echo 'Finished Infrastructure Deployment'
                 }
             }
