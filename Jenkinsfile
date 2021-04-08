@@ -11,7 +11,7 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Application Tests'
-                    sh 'python3 ./src/test_DataGenerator'
+                    sh 'python3 ./src/test_DataGenerator.py'
                     echo 'Finished Application Tests'
                 }
             }
