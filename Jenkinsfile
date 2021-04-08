@@ -24,7 +24,7 @@ pipeline {
             }
             steps {
                 echo 'Building Docker Image'
-                sh 'docker login -u ${env.DOCKER_CREDENTIALS_USR} -p ${env.DOCKER_CREDENTIALS_PSW}'
+                sh 'docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW'
                 sh 'docker build --tag AQSDataGenerator:latest .'
                 echo 'Finished Building Docker Image'
             }
@@ -37,7 +37,7 @@ pipeline {
             }
             steps {
                 echo 'Publishing Docker Image'
-                sh 'docker push ${env.DOCKER_CREDENTIALS_USR}/AQSDataGenerator:latest'
+                sh 'docker push $DOCKER_CREDENTIALS_USR/AQSDataGenerator:latest'
                 echo 'Finished Publishing Docker Image'
             }
         }
@@ -45,7 +45,7 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Infrastructure Tests'
-                    sh 'python3 ./scripts/create-task-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}'
+                    sh "python3 ./scripts/create-task-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}"
                     sh 'taskcat test run'
                     echo 'Finished Infrastructure Tests'
                 }
@@ -60,7 +60,7 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Infrastructure Deployment'
-                    sh 'python3 ./scripts/deploy-infrastructure.py --StackName ${env.AQS_GENERATORS_STACK_NAME} --KeyName ${env.AQS_GENERATORS_KEY_NAME} --Region ${env.AQS_GENERATORS_REGION} --PrivateKeyS3Bucket ${env.AQS_GENERATORS_KEY_S3_BUCKET} --PrivateKeyS3FilePath ${env.AQS_GENERATORS_KEY_S3_PATH}'
+                    sh "python3 ./scripts/deploy-infrastructure.py --StackName ${env.AQS_GENERATORS_STACK_NAME} --KeyName ${env.AQS_GENERATORS_KEY_NAME} --Region ${env.AQS_GENERATORS_REGION} --PrivateKeyS3Bucket ${env.AQS_GENERATORS_KEY_S3_BUCKET} --PrivateKeyS3FilePath ${env.AQS_GENERATORS_KEY_S3_PATH}"
                     echo 'Finished Infrastructure Deployment'
                 }
             }
