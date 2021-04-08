@@ -17,11 +17,6 @@ pipeline {
             }
         }
         stage('Build Docker Image') {
-            when {
-                expression {
-                    currentBuild.result == 'SUCCESS'
-                }
-            }
             steps {
                 echo 'Building Docker Image'
                 sh 'docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW'
@@ -30,11 +25,6 @@ pipeline {
             }
         }
         stage('Publish Docker Image') {
-            when {
-                expression {
-                    currentBuild.result == 'SUCCESS'
-                }
-            }
             steps {
                 echo 'Publishing Docker Image'
                 sh 'docker push $DOCKER_CREDENTIALS_USR/AQSDataGenerator:latest'
@@ -45,18 +35,13 @@ pipeline {
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Infrastructure Tests'
-                    sh "python3 ./scripts/create-task-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}"
+                    sh "python3 ./scripts/create-taskcat-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}"
                     sh 'taskcat test run'
                     echo 'Finished Infrastructure Tests'
                 }
             }
         }
         stage('Deploy Infrastructure') {
-            when {
-                expression {
-                    currentBuild.result == 'SUCCESS'
-                }
-            }
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Infrastructure Deployment'
@@ -66,11 +51,6 @@ pipeline {
             }
         }
         stage('Configure Infrastructure') {
-            when {
-                expression {
-                    currentBuild.result == 'SUCCESS'
-                }
-            }
             steps {
                 echo 'Starting Infrastructure Configuration'
                 sh 'ansible-playbook -i ansible/hosts.ini ansible/InfrastructureConfiguration.yaml'
@@ -78,11 +58,6 @@ pipeline {
             }
         }
         stage('Deploy Application') {
-            when {
-                expression {
-                    currentBuild.result == 'SUCCESS'
-                }
-            }
             steps {
                 echo 'Starting Application Deployment'
                 sh 'ansible-playbook -i ansible/hosts.ini ansible/ApplicationDeployment.yaml'
