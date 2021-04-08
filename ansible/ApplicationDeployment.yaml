@@ -21,11 +21,11 @@
         fi
     - name: Deploy
       shell: >
-        docker run -d 
+        docker run -d
         --cidfile {{ ContainerIdFile }}
         -e AWS_ACCESS_KEY_ID={{ AwsAccessKeyId }}
         -e AWS_SECRET_ACCESS_KEY={{ AwsSecretAccessKey }}
         -e AWS_DEFAULT_REGION={{ AwsDefaultRegion }}
         -p 80:80
         -p 443:443
-        {{ DockerUserName }}/{{ AQSGeneratorsDockerImageTagName }}:latest)
+        {{ DockerUserName }}/{{ AQSGeneratorsDockerImageTagName }}:latest
