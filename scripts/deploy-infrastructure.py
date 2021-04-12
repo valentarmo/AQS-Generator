@@ -28,11 +28,7 @@ def stack_exists(stack_name, client):
 
 def update_stack(stack_name, key_name, region, client):
     print('Updating CloudFormation Stack')
-    dir_path = os.path.dirname(__file__)
-    template_path = os.path.join(dir_path, '../', 'cloudformation/', 'DataGenerators.yaml')
-    template_body = ''
-    with open(template_path, 'r') as f:
-        template_body = f.read()
+    template_body = get_cloudformation_template()
     response = client.update_stack(
         StackName=stack_name,
         TemplateBody=template_body,
@@ -56,11 +52,7 @@ def wait_until_stack_is_updated(stack_name, client):
 
 def create_stack(stack_name, key_name, region, client):
     print('Creating CloudFormation Stack')
-    dir_path = os.path.dirname(__file__)
-    template_path = os.path.join(dir_path, '../', 'cloudformation/', 'DataGenerators.yaml')
-    template_body = ''
-    with open(template_path, 'r') as f:
-        template_body = f.read()
+    template_body = get_cloudformation_template()
     response = client.create_stack(
         StackName=stack_name,
         TemplateBody=template_body,
@@ -80,6 +72,15 @@ def wait_until_stack_is_created(stack_name, client):
     if status == 'CREATE_FAILED' or status == 'ROLLBACK_COMPLETE':
         raise Exception('Stack Creation Failed')
     print('Stack created')
+
+
+def get_cloudformation_template():
+    dir_path = os.path.dirname(__file__)
+    template_path = os.path.join(dir_path, '../', 'cloudformation/', 'DataGenerators.yaml')
+    template_body = ''
+    with open(template_path, 'r') as f:
+        template_body = f.read()   
+    return template_body
 
 
 def get_hosts_ips(stack_name, client):
