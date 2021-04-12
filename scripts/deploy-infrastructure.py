@@ -7,29 +7,29 @@ import os
 from botocore.exceptions import ClientError
 
 
-def deploy_stack(stack_name, key_name, region, private_key_s3_bucket, private_key_s3_path, client):
-    if stack_exists(stack_name, client):
-        update_stack(stack_name, key_name, region, client)
-        wait_until_stack_is_updated(stack_name, client)
+def deploy_stack(stack_name, key_name, region, private_key_s3_bucket, private_key_s3_path, cloudformation):
+    if stack_exists(stack_name, cloudformation):
+        update_stack(stack_name, key_name, region, cloudformation)
+        wait_until_stack_is_updated(stack_name, cloudformation)
     else:
-        create_stack(stack_name, key_name, region, client)
-        wait_until_stack_is_created(stack_name, client)
+        create_stack(stack_name, key_name, region, cloudformation)
+        wait_until_stack_is_created(stack_name, cloudformation)
     private_key_path = download_private_key(private_key_s3_bucket, private_key_s3_path, key_name) 
-    create_hosts_file('Generators', private_key_path, get_hosts_ips(stack_name, client))
+    create_hosts_file('Generators', private_key_path, get_hosts_ips(stack_name, cloudformation))
 
 
-def stack_exists(stack_name, client):
+def stack_exists(stack_name, cloudformation):
     try:
-        client.describe_stacks(StackName=stack_name)
+        cloudformation.describe_stacks(StackName=stack_name)
         return True
     except ClientError:
         return False
 
 
-def update_stack(stack_name, key_name, region, client):
+def update_stack(stack_name, key_name, region, cloudformation):
     print('Updating CloudFormation Stack')
     template_body = get_cloudformation_template()
-    response = client.update_stack(
+    response = cloudformation.update_stack(
         StackName=stack_name,
         TemplateBody=template_body,
         Parameters=[
@@ -40,20 +40,20 @@ def update_stack(stack_name, key_name, region, client):
     )
 
 
-def wait_until_stack_is_updated(stack_name, client):
-    status = client.describe_stacks(StackName=stack_name)['Stacks'][0]['StackStatus']
+def wait_until_stack_is_updated(stack_name, cloudformation):
+    status = cloudformation.describe_stacks(StackName=stack_name)['Stacks'][0]['StackStatus']
     while status not in ['UPDATE_FAILED', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE']:
         time.sleep(5)
-        status = client.describe_stacks(StackName=stack_name)['Stacks'][0]['StackStatus']
+        status = cloudformation.describe_stacks(StackName=stack_name)['Stacks'][0]['StackStatus']
     if status == 'UPDATE_CREATE_FAILED' or status == 'UPDATE_ROLLBACK_COMPLETE':
         raise Exception('Stack Update Failed')
     print('Stack Updated')
 
 
-def create_stack(stack_name, key_name, region, client):
+def create_stack(stack_name, key_name, region, cloudformation):
     print('Creating CloudFormation Stack')
     template_body = get_cloudformation_template()
-    response = client.create_stack(
+    response = cloudformation.create_stack(
         StackName=stack_name,
         TemplateBody=template_body,
         Parameters=[
@@ -64,11 +64,11 @@ def create_stack(stack_name, key_name, region, client):
     )
 
 
-def wait_until_stack_is_created(stack_name, client):
-    status = client.describe_stacks(StackName=stack_name)['Stacks'][0]['StackStatus']
+def wait_until_stack_is_created(stack_name, cloudformation):
+    status = cloudformation.describe_stacks(StackName=stack_name)['Stacks'][0]['StackStatus']
     while status not in ['CREATE_FAILED', 'CREATE_COMPLETE', 'ROLLBACK_COMPLETE']:
         time.sleep(5)
-        status = client.describe_stacks(StackName=stack_name)['Stacks'][0]['StackStatus']
+        status = cloudformation.describe_stacks(StackName=stack_name)['Stacks'][0]['StackStatus']
     if status == 'CREATE_FAILED' or status == 'ROLLBACK_COMPLETE':
         raise Exception('Stack Creation Failed')
     print('Stack created')
@@ -83,9 +83,9 @@ def get_cloudformation_template():
     return template_body
 
 
-def get_hosts_ips(stack_name, client):
+def get_hosts_ips(stack_name, cloudformation):
     print('Getting host IPs')
-    response = client.describe_stacks(StackName=stack_name)
+    response = cloudformation.describe_stacks(StackName=stack_name)
     ips = map(lambda output: output['OutputValue'],  response['Stacks'][0]['Outputs'])
     print(f'Host Ips {ips}')
     return ips
