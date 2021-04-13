@@ -1,6 +1,5 @@
 - hosts: Generators
   remote_user: ec2-user
-  become: yes
 
   vars:
     ContainerIdFile: ~/aqs_generator_container_id.cid 
@@ -19,6 +18,7 @@
           docker rm $CONTAINER_ID
           rm {{ ContainerIdFile }}
         fi
+
     - name: Deploy
       shell: >
         docker run -d

@@ -46,7 +46,6 @@ pipeline {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Infrastructure Deployment'
                     sh "python3 scripts/deploy-infrastructure.py --StackName ${env.AQS_GENERATORS_STACK_NAME} --KeyName ${env.AQS_GENERATORS_KEY_NAME} --Region ${env.AWS_DEFAULT_REGION} --PrivateKeyS3Bucket ${env.AQS_GENERATORS_KEY_S3_BUCKET} --PrivateKeyS3FilePath ${env.AQS_GENERATORS_KEY_S3_PATH}"
-                    sleep 30
                     echo 'Finished Infrastructure Deployment'
                 }
             }
