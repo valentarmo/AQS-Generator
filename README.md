@@ -2,7 +2,7 @@
 Generate random simulated air quality data from ten EC2 instances for [AQS](https://github.com/valentarmo/AQS). Meant to be automatically deployed by the Jenkins server from [AQS-Builder](https://github.com/valentarmo/AQS-Builder).
 
 ## Infrastructure Testing
-The CloudFormation stack can be tested using taskcat. To do an appropriate `.taskcat.yml` file can be generated using `scripts/create-taskcat-file.py`. It will generate the `.taskcat.yml` file in the project's root folder.
+The CloudFormation stack can be tested using taskcat. To do it, an appropriate `.taskcat.yml` file can be generated using `scripts/create-taskcat-file.py`. It will generate the `.taskcat.yml` file in the project's root folder.
 
     $ python scripts/create-taskcat-file.py \
         --Region <AWS Region> \
