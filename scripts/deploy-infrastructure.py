@@ -76,7 +76,7 @@ def wait_until_stack_is_created(stack_name, cloudformation):
 
 def get_cloudformation_template():
     dir_path = os.path.dirname(__file__)
-    template_path = os.path.join(dir_path, '../', 'cloudformation/', 'DataGenerators.yaml')
+    template_path = os.path.join(dir_path, '..', 'DataGenerators.json')
     template_body = ''
     with open(template_path, 'r') as f:
         template_body = f.read()   
@@ -87,7 +87,6 @@ def get_hosts_ips(stack_name, cloudformation):
     print('Getting host IPs')
     response = cloudformation.describe_stacks(StackName=stack_name)
     ips = map(lambda output: output['OutputValue'],  response['Stacks'][0]['Outputs'])
-    print(f'Host Ips {ips}')
     return ips
 
 

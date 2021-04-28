@@ -3,5 +3,6 @@ ansible/*.ini
 **/*.pem
 secrets/*
 *taskcat*
+*Generators.json
 
 !scripts/create-taskcat-file.py

@@ -31,11 +31,20 @@ pipeline {
                 echo 'Finished Publishing Docker Image'
             }
         }
+        stage('Generate CloudFormation template') {
+            steps {
+                withEnv(['PATH+EXTRA=/usr/local/bin']) {
+                    echo 'Starting CloudFormation template generation'
+                    sh "python3 scripts/generate-cfn-template.py --NumberOfInstances ${env.AQS_GENERATORS_NUMBER_OF_INSTANCES}"
+                    echo 'Finished CloudFormation template generation'
+                }
+            }
+        }
         stage('Test infrastructure') {
             steps {
                 withEnv(['PATH+EXTRA=/usr/local/bin']) {
                     echo 'Starting Infrastructure Tests'
-                    sh "python3 scripts/create-taskcat-file.py --Region ${env.AWS_DEFAULT_REGION} --KeyName ${env.AQS_GENERATORS_KEY_NAME}"
+                    sh "python3 scripts/create-taskcat-file.py --Region ${env.AWS_DEFAULT_REGION} --S3Bucket ${env.AQS_S3_TASKCAT_BUCKET_NAME} --KeyName ${env.AQS_GENERATORS_KEY_NAME}"
                     sh 'taskcat test run'
                     echo 'Finished Infrastructure Tests'
                 }
