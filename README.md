@@ -6,6 +6,7 @@ The CloudFormation stack can be tested using taskcat. To do it, an appropriate `
 
     $ python scripts/create-taskcat-file.py \
         --Region <AWS Region> \
+        --S3Bucket <S3Bucket> \
         --KeyName <EC2 Key Pair Name>
     $ taskcat test run
 
